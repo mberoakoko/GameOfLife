@@ -8,7 +8,7 @@ import javafx.stage.Stage;
 
 
 /**
- * JavaFX App
+ * <h1>JavaFX App</h1>
  */
 public class App extends Application {
 
@@ -16,10 +16,11 @@ public class App extends Application {
     public void start(Stage stage) {
 
         MainView main = new MainView();
-        var scene = new Scene(main, 640, 480);
+        var scene = new Scene(main, 640, 550);
         stage.setScene(scene);
         stage.show();
         main.draw();
+
 
     }
 

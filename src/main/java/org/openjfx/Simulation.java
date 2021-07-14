@@ -4,6 +4,8 @@ import java.util.Arrays;
 
 public class Simulation {
     private final int width , height;
+    public static final int DEAD = 0;
+    public static final int ALIVE = 1;
     private int [][] board;
 
     public int getWidth() {
@@ -17,11 +19,11 @@ public class Simulation {
     public Simulation(int width, int height) {
         this.width = width;
         this.height = height;
-        board = new int[height][width];
+        board = new int[height][width]; // Board initialized with zero (all cells dead)
     }
 
-    public void setAlive(int x , int y){ board[y][x] = 1; }
-    public void setDead(int x, int y){ board[y][x] = 0; }
+    public void setAlive(int x , int y){ this.setState(x, y, ALIVE); }
+    public void setDead(int x, int y){ this.setState(x, y, DEAD); }
 
     @Override
     public String toString() {
@@ -49,19 +51,32 @@ public class Simulation {
         return this.board[y][x];
     }
 
+    public void setState(int x, int y , int state){
+        if(x < 0 || x > width) return;
+        if(y < 0 || y > height) return;
+        this.board[y][x] = state;
+    }
 
+    /**
+     * <h1>Live Cell Count</h1>
+     * <p>Counts the numbers of live cells around a cell by looping through</br>
+     *    a 3 * 3 block
+     * </p>
+     * @param x x Position of the cell
+     * @param y y Position of the cell
+     * @return <i><b>number of alive cells</b></i>
+     */
     public int countLiveNeighbours(int x, int y){
         int count = 0;
-        int begin_y = y - 1;
+        int y_prime = y - 1;
+        int x_prime = x - 1;
         int max_x = x + 1;
         int max_y = y + 1;
-        for (int offSet_y =  y - 1; offSet_y <= max_x; offSet_y++) {
-            for (int offSet_x = y - 1;offSet_x <= max_x; offSet_x++) {
-                if(offSet_x == x && offSet_y == y) break;
-                else {
-                    if(getState(offSet_x, offSet_y) == 1) count += 1;
+        for (int offSet_y =  y - 1; offSet_y <= max_y; offSet_y++) {
+            for (int offSet_x = x - 1;offSet_x <= max_x; offSet_x++) {
+                if(!(offSet_x == x && offSet_y == y)){
+                    if(getState(offSet_x, offSet_y) == 1) count++;
                 }
-
             }
         }
         return count;
@@ -72,11 +87,11 @@ public class Simulation {
             for (int x = 0; x < width; x++) {
                 int liveNeighbours = countLiveNeighbours(x, y);
                 if(getState(x, y) == 1){
-                    if(liveNeighbours < 2) newBoard[x][y] = 0;
-                    else if(liveNeighbours == 2 || liveNeighbours == 3) newBoard[x][y] = 1;
-                    else newBoard[x][y] = 0;
+                    if(liveNeighbours < 2) newBoard[y][x] = DEAD;
+                    else if(liveNeighbours == 2 || liveNeighbours == 3) newBoard[y][x] = ALIVE;
+                    else newBoard[y][x] = DEAD;
                 } else {
-                    if(liveNeighbours == 3) newBoard[x][y] = 1;
+                    if(liveNeighbours == 3) newBoard[y][x] = ALIVE;
                 }
             }
         }
@@ -87,11 +102,13 @@ public class Simulation {
         sim.setAlive(1, 2);
         sim.setAlive(2, 2);
         sim.setAlive(3, 2);
+
         System.out.println(sim);
         for (int i = 0; i < 10; i++) {
             sim.step();
             System.out.println(sim);
         }
+        //System.out.printf("Live neighbours : %d \n", sim.countLiveNeighbours(2,2));
 
     }
 }
